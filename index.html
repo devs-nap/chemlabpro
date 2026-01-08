@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChemLab Pro | Complete 118 Elements Simulator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #3b82f6;
+            --primary-green: #10b981;
+            --primary-red: #ef4444;
+            --primary-purple: #8b5cf6;
+            --primary-yellow: #f59e0b;
+            --primary-cyan: #06b6d4;
+            --metal-color: #f59e0b;
+            --nonmetal-color: #3b82f6;
+            --metalloid-color: #10b981;
+            --noble-color: #8b5cf6;
+            --transition-metal-color: #ef4444;
+            --lanthanide-color: #ec4899;
+            --actinide-color: #8b5cf6;
+            --dark-bg: #0f172a;
+            --dark-card: #1e293b;
+            --dark-text: #f8fafc;
+            --light-bg: #f8fafc;
+            --light-card: #ffffff;
+            --light-text: #1e293b;
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            color: var(--dark-text);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 25%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 25%);
+        }
+
+        body.light-mode {
+            background: var(--light-bg);
+            color: var(--light-text);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.03) 0%, transparent 25%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.03) 0%, transparent 25%);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .logo-icon {
+            font-size: 36px;
+            color: var(--primary-cyan);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .logo h1 {
+            font-size: 42px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-cyan), var(--primary-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .tagline {
+            font-size: 18px;
+            color: #94a3b8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        body.light-mode .tagline {
+            color: #64748b;
+        }
+
+        .element-counter {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-cyan));
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+            min-height: 600px;
+        }
+
+        @media (max-width: 1024px) {
+            .app-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .left-panel, .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .panel {
+            background: var(--dark-card);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        body.light-mode .panel {
+            background: var(--light-card);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .panel-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--primary-cyan);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-title i {
+            font-size: 20px;
+        }
+
+        .selection-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 20px;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .selection-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+            }
+        }
+
+        .element-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .selector-label {
+            font-weight: 500;
+            color: #cbd5e1;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        body.light-mode .selector-label {
+            color: #475569;
+        }
+
+        .element-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .dropdown-button {
+            width: 100%;
+            padding: 18px 20px;
+            background: rgba(30, 41, 59, 0.7);
+            border: 2px solid #334155;
+            border-radius: 12px;
+            font-size: 18px;
+            color: var(--dark-text);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        body.light-mode .dropdown-button {
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            color: var(--light-text);
+        }
+
+        .dropdown-button:hover {
+            border-color: var(--primary-cyan);
+        }
+
+        .dropdown-content {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            width: 100%;
+            max-height: 300px;
+            overflow-y: auto;
+            background: var(--dark-card);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            z-index: 100;
+            display: none;
+            border: 1px solid #334155;
+        }
+
+        body.light-mode .dropdown-content {
+            background: var(--light-card);
+            border: 1px solid #cbd5e1;
+        }
+
+        .dropdown-content.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .element-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            font-size: 14px;
+        }
+
+        .element-option:last-child {
+            border-bottom: none;
+        }
+
+        .element-option:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .element-symbol {
+            font-weight: 700;
+            font-size: 16px;
+            min-width: 35px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .element-name {
+            flex-grow: 1;
+            margin-left: 10px;
+            color: #94a3b8;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        body.light-mode .element-name {
+            color: #64748b;
+        }
+
+        .element-valency {
+            background: var(--primary-green);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            min-width: 25px;
+            text-align: center;
+        }
+
+        .element-type {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .type-metal { background: var(--metal-color); color: white; }
+        .type-nonmetal { background: var(--nonmetal-color); color: white; }
+        .type-metalloid { background: var(--metalloid-color); color: white; }
+        .type-noble { background: var(--noble-color); color: white; }
+        .type-transition { background: var(--transition-metal-color); color: white; }
+        .type-lanthanide { background: var(--lanthanide-color); color: white; }
+        .type-actinide { background: var(--actinide-color); color: white; }
+
+        .reaction-symbol {
+            font-size: 36px;
+            color: var(--primary-cyan);
+            text-align: center;
+            font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+            .reaction-symbol {
+                transform: rotate(90deg);
+                margin: 20px 0;
+            }
+        }
+
+        .animation-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            min-height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .particle-track {
+            width: 80%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #475569, transparent);
+            position: relative;
+            margin: 40px 0;
+        }
+
+        body.light-mode .particle-track {
+            background: linear-gradient(90deg, transparent, #cbd5e1, transparent);
+        }
+
+        .particle {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 16px;
+            z-index: 10;
+            transition: var(--transition);
+            box-shadow: 0 0 20px currentColor;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .particle-left {
+            left: 0;
+            transform: translateX(-50%);
+            animation: moveRight 3s forwards;
+        }
+
+        .particle-right {
+            right: 0;
+            transform: translateX(50%);
+            animation: moveLeft 3s forwards;
+        }
+
+        @keyframes moveRight {
+            0% { left: 0; }
+            50% { left: 50%; transform: translateX(-50%) scale(1.2); }
+            100% { left: 50%; transform: translateX(-50%) scale(1); }
+        }
+
+        @keyframes moveLeft {
+            0% { right: 0; }
+            50% { right: 50%; transform: translateX(50%) scale(1.2); }
+            100% { right: 50%; transform: translateX(50%) scale(1); }
+        }
+
+        .reaction-spark {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary-green), transparent 70%);
+            opacity: 0;
+            z-index: 5;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            animation: spark 0.5s 2.5s forwards;
+        }
+
+        @keyframes spark {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.5); }
+            100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .status-text {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+            color: #94a3b8;
+            min-height: 30px;
+            transition: var(--transition);
+        }
+
+        body.light-mode .status-text {
+            color: #64748b;
+        }
+
+        .compound-result {
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s 3s forwards;
+        }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .formula-display {
+            font-size: 60px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--primary-green);
+            margin: 20px 0;
+        }
+
+        .compound-name {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 15px;
+        }
+
+        body.light-mode .compound-name {
+            color: var(--light-text);
+        }
+
+        .compound-type {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .type-ionic { background: rgba(245, 158, 11, 0.2); color: var(--metal-color); border: 2px solid var(--metal-color); }
+        .type-covalent { background: rgba(59, 130, 246, 0.2); color: var(--nonmetal-color); border: 2px solid var(--nonmetal-color); }
+        .type-oxide { background: rgba(239, 68, 68, 0.2); color: var(--primary-red); border: 2px solid var(--primary-red); }
+        .type-acid { background: rgba(16, 185, 129, 0.2); color: var(--primary-green); border: 2px solid var(--primary-green); }
+        .type-base { background: rgba(139, 92, 246, 0.2); color: var(--primary-purple); border: 2px solid var(--primary-purple); }
+        .type-salt { background: rgba(6, 182, 212, 0.2); color: var(--primary-cyan); border: 2px solid var(--primary-cyan); }
+
+        .explanation-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .explanation-step {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--primary-cyan);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex-grow: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 5px;
+        }
+
+        body.light-mode .step-title {
+            color: var(--light-text);
+        }
+
+        .step-description {
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        body.light-mode .step-description {
+            color: #64748b;
+        }
+
+        .valency-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 10px 0;
+            font-size: 18px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .cross-method {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(30, 41, 59, 0.5);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 15px 0;
+            border-left: 4px solid var(--primary-green);
+        }
+
+        body.light-mode .cross-method {
+            background: #f8fafc;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-cyan), var(--primary-purple));
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(6, 182, 212, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: rgba(148, 163, 184, 0.2);
+            color: var(--dark-text);
+        }
+
+        body.light-mode .btn-secondary {
+            background: rgba(100, 116, 139, 0.1);
+            color: var(--light-text);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(148, 163, 184, 0.3);
+        }
+
+        .btn-examples {
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--primary-purple);
+        }
+
+        .btn-examples:hover {
+            background: rgba(139, 92, 246, 0.3);
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            color: var(--primary-red);
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(148, 163, 184, 0.2);
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        body.light-mode .footer {
+            border-top: 1px solid rgba(100, 116, 139, 0.2);
+            color: #64748b;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--dark-card);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--dark-text);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        body.light-mode .theme-toggle {
+            background: var(--light-card);
+            color: var(--light-text);
+        }
+
+        .examples-container {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(30, 41, 59, 0.3);
+            border-radius: 12px;
+            border: 1px dashed #475569;
+        }
+
+        body.light-mode .examples-container {
+            background: rgba(248, 250, 252, 0.5);
+            border: 1px dashed #cbd5e1;
+        }
+
+        .examples-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary-cyan);
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+        }
+
+        .example-btn {
+            padding: 10px 15px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            color: #60a5fa;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .example-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            transform: translateY(-2px);
+        }
+
+        body.light-mode .example-btn {
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: var(--primary-blue);
+        }
+
+        .element-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .category-tag {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .logo h1 {
+                font-size: 32px;
+            }
+            
+            .formula-display {
+                font-size: 40px;
+            }
+            
+            .compound-name {
+                font-size: 22px;
+            }
+            
+            .panel {
+                padding: 20px;
+            }
+            
+            .app-grid {
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-flask"></i>
+                </div>
+                <h1>ChemLab Pro</h1>
+            </div>
+            <p class="tagline">Complete 118 Elements Chemistry Simulator | Virtual Laboratory</p>
+            <div class="element-counter">
+                <i class="fas fa-atom"></i> 92 Metals • 18 Non-metals • 8 Metalloids • 7 Noble Gases
+            </div>
+        </div>
+
+        <div class="app-grid">
+            <!-- Left Panel: Element Selection -->
+            <div class="left-panel">
+                <div class="panel">
+                    <h2 class="panel-title">
+                        <i class="fas fa-atom"></i> Element Selection
+                    </h2>
+                    
+                    <div class="selection-grid">
+                        <!-- Metal Selection -->
+                        <div class="element-selector">
+                            <div class="selector-label">Metal Element (92 elements)</div>
+                            <div class="element-dropdown">
+                                <button class="dropdown-button" id="metalDropdown">
+                                    <span id="metalSelected">Select Metal</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                                <div class="dropdown-content" id="metalOptions"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Reaction Symbol -->
+                        <div class="reaction-symbol">+</div>
+                        
+                        <!-- Non-Metal Selection -->
+                        <div class="element-selector">
+                            <div class="selector-label">Non-Metal Element (18 elements)</div>
+                            <div class="element-dropdown">
+                                <button class="dropdown-button" id="nonMetalDropdown">
+                                    <span id="nonMetalSelected">Select Non-Metal</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                                <div class="dropdown-content" id="nonMetalOptions"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="examples-container">
+                        <div class="examples-title">Quick Examples:</div>
+                        <div class="examples-grid" id="examplesGrid">
+                            <!-- Examples will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="element-categories">
+                        <div class="category-tag" style="background: rgba(245, 158, 11, 0.2); color: var(--metal-color);">
+                            <div style="width: 10px; height: 10px; background: var(--metal-color); border-radius: 50%;"></div>
+                            Metals (92)
+                        </div>
+                        <div class="category-tag" style="background: rgba(59, 130, 246, 0.2); color: var(--nonmetal-color);">
+                            <div style="width: 10px; height: 10px; background: var(--nonmetal-color); border-radius: 50%;"></div>
+                            Non-metals (18)
+                        </div>
+                        <div class="category-tag" style="background: rgba(16, 185, 129, 0.2); color: var(--metalloid-color);">
+                            <div style="width: 10px; height: 10px; background: var(--metalloid-color); border-radius: 50%;"></div>
+                            Metalloids (8)
+                        </div>
+                        <div class="category-tag" style="background: rgba(139, 92, 246, 0.2); color: var(--noble-color);">
+                            <div style="width: 10px; height: 10px; background: var(--noble-color); border-radius: 50%;"></div>
+                            Noble Gases (7)
+                        </div>
+                    </div>
+                    
+                    <div class="controls">
+                        <button class="btn btn-secondary" id="resetBtn">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                        <button class="btn btn-primary" id="generateBtn">
+                            <i class="fas fa-bolt"></i> Generate Compound
+                        </button>
+                    </div>
+                    
+                    <div class="error-message" id="errorMessage">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span id="errorText">Please select both elements to continue</span>
+                    </div>
+                </div>
+                
+                <!-- Explanation Panel -->
+                <div class="panel">
+                    <h2 class="panel-title">
+                        <i class="fas fa-lightbulb"></i> Chemical Explanation
+                    </h2>
+                    
+                    <div class="explanation-content" id="explanationContent">
+                        <div class="explanation-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <div class="step-title">Select Elements</div>
+                                <div class="step-description">Choose one metal and one non-metal element from the dropdowns</div>
+                            </div>
+                        </div>
+                        
+                        <div class="explanation-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <div class="step-title">Valency Analysis</div>
+                                <div class="step-description">The simulator will check the valencies of both elements</div>
+                            </div>
+                        </div>
+                        
+                        <div class="explanation-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <div class="step-title">Cross Method</div>
+                                <div class="step-description">Chemical formula generated using the cross-valency method</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Panel: Animation & Results -->
+            <div class="right-panel">
+                <div class="panel" style="flex-grow: 1;">
+                    <h2 class="panel-title">
+                        <i class="fas fa-vial"></i> Compound Formation
+                    </h2>
+                    
+                    <div class="animation-container" id="animationContainer">
+                        <div class="particle-track">
+                            <div class="particle particle-left" id="leftParticle">Na</div>
+                            <div class="particle particle-right" id="rightParticle">Cl</div>
+                            <div class="reaction-spark"></div>
+                        </div>
+                        
+                        <div class="status-text" id="statusText">Ready to generate compound</div>
+                        
+                        <div class="compound-result" id="compoundResult" style="display: none;">
+                            <div class="formula-display" id="formulaDisplay">NaCl</div>
+                            <div class="compound-name" id="compoundName">Sodium Chloride</div>
+                            <div class="compound-type type-salt" id="compoundType">Salt</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Chemistry Details -->
+                <div class="panel">
+                    <h2 class="panel-title">
+                        <i class="fas fa-calculator"></i> Chemical Details
+                    </h2>
+                    
+                    <div id="chemistryDetails">
+                        <div class="valency-display" id="valencyDisplay">
+                            <span>Na<sup>+1</sup></span>
+                            <i class="fas fa-plus" style="color: #94a3b8;"></i>
+                            <span>Cl<sup>-1</sup></span>
+                        </div>
+                        
+                        <div class="cross-method" id="crossMethod">
+                            Cross Method: Na¹ Cl¹ → NaCl
+                        </div>
+                        
+                        <div class="explanation-step">
+                            <div class="step-number"><i class="fas fa-check"></i></div>
+                            <div class="step-content">
+                                <div class="step-title">Compound Type</div>
+                                <div class="step-description">Ionic compound formed by electron transfer from metal to non-metal</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>ChemLab Pro &copy; 2023 | Complete 118 Elements Simulator | 92 Metals + 18 Non-metals + 8 Metalloids | Strict School-Level Chemistry Rules</p>
+        </div>
+    </div>
+
+    <script>
+        // COMPLETE 118 ELEMENTS DATABASE
+        const elements = [
+            // ========== METALS (92 elements) ==========
+            
+            // Alkali Metals (6)
+            { symbol: "Li", name: "Lithium", valency: 1, type: "metal", category: "Alkali Metal", color: "#f59e0b", atomicNumber: 3 },
+            { symbol: "Na", name: "Sodium", valency: 1, type: "metal", category: "Alkali Metal", color: "#f59e0b", atomicNumber: 11 },
+            { symbol: "K", name: "Potassium", valency: 1, type: "metal", category: "Alkali Metal", color: "#f59e0b", atomicNumber: 19 },
+            { symbol: "Rb", name: "Rubidium", valency: 1, type: "metal", category: "Alkali Metal", color: "#f59e0b", atomicNumber: 37 },
+            { symbol: "Cs", name: "Cesium", valency: 1, type: "metal", category: "Alkali Metal", color: "#f59e0b", atomicNumber: 55 },
+            { symbol: "Fr", name: "Francium", valency: 1, type: "metal", category: "Alkali Metal", color: "#f59e0b", atomicNumber: 87 },
+            
+            // Alkaline Earth Metals (6)
+            { symbol: "Be", name: "Beryllium", valency: 2, type: "metal", category: "Alkaline Earth", color: "#f59e0b", atomicNumber: 4 },
+            { symbol: "Mg", name: "Magnesium", valency: 2, type: "metal", category: "Alkaline Earth", color: "#f59e0b", atomicNumber: 12 },
+            { symbol: "Ca", name: "Calcium", valency: 2, type: "metal", category: "Alkaline Earth", color: "#f59e0b", atomicNumber: 20 },
+            { symbol: "Sr", name: "Strontium", valency: 2, type: "metal", category: "Alkaline Earth", color: "#f59e0b", atomicNumber: 38 },
+            { symbol: "Ba", name: "Barium", valency: 2, type: "metal", category: "Alkaline Earth", color: "#f59e0b", atomicNumber: 56 },
+            { symbol: "Ra", name: "Radium", valency: 2, type: "metal", category: "Alkaline Earth", color: "#f59e0b", atomicNumber: 88 },
+            
+            // Transition Metals (38)
+            { symbol: "Sc", name: "Scandium", valency: 3, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 21 },
+            { symbol: "Ti", name: "Titanium", valency: 4, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 22 },
+            { symbol: "V", name: "Vanadium", valency: 5, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 23 },
+            { symbol: "Cr", name: "Chromium", valency: 3, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 24 },
+            { symbol: "Mn", name: "Manganese", valency: 2, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 25 },
+            { symbol: "Fe", name: "Iron", valency: 2, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 26 },
+            { symbol: "Co", name: "Cobalt", valency: 2, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 27 },
+            { symbol: "Ni", name: "Nickel", valency: 2, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 28 },
+            { symbol: "Cu", name: "Copper", valency: 2, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 29 },
+            { symbol: "Zn", name: "Zinc", valency: 2, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 30 },
+            { symbol: "Y", name: "Yttrium", valency: 3, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 39 },
+            { symbol: "Zr", name: "Zirconium", valency: 4, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 40 },
+            { symbol: "Nb", name: "Niobium", valency: 5, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 41 },
+            { symbol: "Mo", name: "Molybdenum", valency: 6, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 42 },
+            { symbol: "Tc", name: "Technetium", valency: 7, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 43 },
+            { symbol: "Ru", name: "Ruthenium", valency: 3, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 44 },
+            { symbol: "Rh", name: "Rhodium", valency: 3, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 45 },
+            { symbol: "Pd", name: "Palladium", valency: 2, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 46 },
+            { symbol: "Ag", name: "Silver", valency: 1, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 47 },
+            { symbol: "Cd", name: "Cadmium", valency: 2, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 48 },
+            { symbol: "Hf", name: "Hafnium", valency: 4, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 72 },
+            { symbol: "Ta", name: "Tantalum", valency: 5, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 73 },
+            { symbol: "W", name: "Tungsten", valency: 6, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 74 },
+            { symbol: "Re", name: "Rhenium", valency: 7, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 75 },
+            { symbol: "Os", name: "Osmium", valency: 4, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 76 },
+            { symbol: "Ir", name: "Iridium", valency: 4, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 77 },
+            { symbol: "Pt", name: "Platinum", valency: 2, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 78 },
+            { symbol: "Au", name: "Gold", valency: 1, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 79 },
+            { symbol: "Hg", name: "Mercury", valency: 2, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 80 },
+            { symbol: "Rf", name: "Rutherfordium", valency: 4, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 104 },
+            { symbol: "Db", name: "Dubnium", valency: 5, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 105 },
+            { symbol: "Sg", name: "Seaborgium", valency: 6, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 106 },
+            { symbol: "Bh", name: "Bohrium", valency: 7, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 107 },
+            { symbol: "Hs", name: "Hassium", valency: 8, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 108 },
+            { symbol: "Mt", name: "Meitnerium", valency: 9, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 109 },
+            { symbol: "Ds", name: "Darmstadtium", valency: 10, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 110 },
+            { symbol: "Rg", name: "Roentgenium", valency: 11, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 111 },
+            { symbol: "Cn", name: "Copernicium", valency: 12, type: "metal", category: "Transition Metal", color: "#ef4444", atomicNumber: 112 },
+            
+            // Post-Transition Metals (11)
+            { symbol: "Al", name: "Aluminum", valency: 3, type: "metal", category: "Post-Transition", color: "#f59e0b", atomicNumber: 13 },
+            { symbol: "Ga", name: "Gallium", valency: 3, type: "metal", category: "Post-Transition", color: "#f59e0b", atomicNumber: 31 },
+            { symbol: "In", name: "Indium", valency: 3, type: "metal", category: "Post-Transition", color: "#f59e0b", atomicNumber: 49 },
+            { symbol: "Sn", name: "Tin", valency: 4, type: "metal", category: "Post-Transition", color: "#f59e0b", atomicNumber: 50 },
+            { symbol: "Tl", name: "Thallium", valency: 1, type: "metal", category: "Post-Transition", color: "#f59e0b", atomicNumber: 81 },
+            { symbol: "Pb", name: "Lead", valency: 2, type: "metal", category: "Post-Transition", color: "#f59e0b", atomicNumber: 82 },
+            { symbol: "Bi", name: "Bismuth", valency: 3, type: "metal", category: "Post-Transition", color: "#f59e0b", atomicNumber: 83 },
+            { symbol: "Po", name: "Polonium", valency: 2, type: "metal", category: "Post-Transition", color: "#f59e0b", atomicNumber: 84 },
+            { symbol: "Nh", name: "Nihonium", valency: 1, type: "metal", category: "Post-Transition", color: "#f59e0b", atomicNumber: 113 },
+            { symbol: "Fl", name: "Flerovium", valency: 2, type: "metal", category: "Post-Transition", color: "#f59e0b", atomicNumber: 114 },
+            { symbol: "Mc", name: "Moscovium", valency: 3, type: "metal", category: "Post-Transition", color: "#f59e0b", atomicNumber: 115 },
+            
+            // Lanthanides (15)
+            { symbol: "La", name: "Lanthanum", valency: 3, type: "metal", category: "Lanthanide", color: "#ec4899", atomicNumber: 57 },
+            { symbol: "Ce", name: "Cerium", valency: 4, type: "metal", category: "Lanthanide", color: "#ec4899", atomicNumber: 58 },
+            { symbol: "Pr", name: "Praseodymium", valency: 3, type: "metal", category: "Lanthanide", color: "#ec4899", atomicNumber: 59 },
+            { symbol: "Nd", name: "Neodymium", valency: 3, type: "metal", category: "Lanthanide", color: "#ec4899", atomicNumber: 60 },
+            { symbol: "Pm", name: "Promethium", valency: 3, type: "metal", category: "Lanthanide", color: "#ec4899", atomicNumber: 61 },
+            { symbol: "Sm", name: "Samarium", valency: 3, type: "metal", category: "Lanthanide", color: "#ec4899", atomicNumber: 62 },
+            { symbol: "Eu", name: "Europium", valency: 3, type: "metal", category: "Lanthanide", color: "#ec4899", atomicNumber: 63 },
+            { symbol: "Gd", name: "Gadolinium", valency: 3, type: "metal", category: "Lanthanide", color: "#ec4899", atomicNumber: 64 },
+            { symbol: "Tb", name: "Terbium", valency: 3, type: "metal", category: "Lanthanide", color: "#ec4899", atomicNumber: 65 },
+            { symbol: "Dy", name: "Dysprosium", valency: 3, type: "metal", category: "Lanthanide", color: "#ec4899", atomicNumber: 66 },
+            { symbol: "Ho", name: "Holmium", valency: 3, type: "metal", category: "Lanthanide", color: "#ec4899", atomicNumber: 67 },
+            { symbol: "Er", name: "Erbium", valency: 3, type: "metal", category: "Lanthanide", color: "#ec4899", atomicNumber: 68 },
+            { symbol: "Tm", name: "Thulium", valency: 3, type: "metal", category: "Lanthanide", color: "#ec4899", atomicNumber: 69 },
+            { symbol: "Yb", name: "Ytterbium", valency: 3, type: "metal", category: "Lanthanide", color: "#ec4899", atomicNumber: 70 },
+            { symbol: "Lu", name: "Lutetium", valency: 3, type: "metal", category: "Lanthanide", color: "#ec4899", atomicNumber: 71 },
+            
+            // Actinides (15)
+            { symbol: "Ac", name: "Actinium", valency: 3, type: "metal", category: "Actinide", color: "#8b5cf6", atomicNumber: 89 },
+            { symbol: "Th", name: "Thorium", valency: 4, type: "metal", category: "Actinide", color: "#8b5cf6", atomicNumber: 90 },
+            { symbol: "Pa", name: "Protactinium", valency: 5, type: "metal", category: "Actinide", color: "#8b5cf6", atomicNumber: 91 },
+            { symbol: "U", name: "Uranium", valency: 6, type: "metal", category: "Actinide", color: "#8b5cf6", atomicNumber: 92 },
+            { symbol: "Np", name: "Neptunium", valency: 5, type: "metal", category: "Actinide", color: "#8b5cf6", atomicNumber: 93 },
+            { symbol: "Pu", name: "Plutonium", valency: 4, type: "metal", category: "Actinide", color: "#8b5cf6", atomicNumber: 94 },
+            { symbol: "Am", name: "Americium", valency: 3, type: "metal", category: "Actinide", color: "#8b5cf6", atomicNumber: 95 },
+            { symbol: "Cm", name: "Curium", valency: 3, type: "metal", category: "Actinide", color: "#8b5cf6", atomicNumber: 96 },
+            { symbol: "Bk", name: "Berkelium", valency: 4, type: "metal", category: "Actinide", color: "#8b5cf6", atomicNumber: 97 },
+            { symbol: "Cf", name: "Californium", valency: 3, type: "metal", category: "Actinide", color: "#8b5cf6", atomicNumber: 98 },
+            { symbol: "Es", name: "Einsteinium", valency: 3, type: "metal", category: "Actinide", color: "#8b5cf6", atomicNumber: 99 },
+            { symbol: "Fm", name: "Fermium", valency: 3, type: "metal", category: "Actinide", color: "#8b5cf6", atomicNumber: 100 },
+            { symbol: "Md", name: "Mendelevium", valency: 3, type: "metal", category: "Actinide", color: "#8b5cf6", atomicNumber: 101 },
+            { symbol: "No", name: "Nobelium", valency: 3, type: "metal", category: "Actinide", color: "#8b5cf6", atomicNumber: 102 },
+            { symbol: "Lr", name: "Lawrencium", valency: 3, type: "metal", category: "Actinide", color: "#8b5cf6", atomicNumber: 103 },
+            
+            // ========== NON-METALS (18 elements) ==========
+            
+            // Reactive Non-Metals (11)
+            { symbol: "H", name: "Hydrogen", valency: 1, type: "nonmetal", category: "Reactive Nonmetal", color: "#3b82f6", atomicNumber: 1 },
+            { symbol: "C", name: "Carbon", valency: 4, type: "nonmetal", category: "Reactive Nonmetal", color: "#3b82f6", atomicNumber: 6 },
+            { symbol: "N", name: "Nitrogen", valency: 3, type: "nonmetal", category: "Reactive Nonmetal", color: "#3b82f6", atomicNumber: 7 },
+            { symbol: "O", name: "Oxygen", valency: 2, type: "nonmetal", category: "Reactive Nonmetal", color: "#3b82f6", atomicNumber: 8 },
+            { symbol: "P", name: "Phosphorus", valency: 3, type: "nonmetal", category: "Reactive Nonmetal", color: "#3b82f6", atomicNumber: 15 },
+            { symbol: "S", name: "Sulfur", valency: 2, type: "nonmetal", category: "Reactive Nonmetal", color: "#3b82f6", atomicNumber: 16 },
+            { symbol: "Se", name: "Selenium", valency: 2, type: "nonmetal", category: "Reactive Nonmetal", color: "#3b82f6", atomicNumber: 34 },
+            { symbol: "I", name: "Iodine", valency: 1, type: "nonmetal", category: "Halogen", color: "#3b82f6", atomicNumber: 53 },
+            { symbol: "At", name: "Astatine", valency: 1, type: "nonmetal", category: "Halogen", color: "#3b82f6", atomicNumber: 85 },
+            { symbol: "Ts", name: "Tennessine", valency: 1, type: "nonmetal", category: "Halogen", color: "#3b82f6", atomicNumber: 117 },
+            { symbol: "Og", name: "Oganesson", valency: 0, type: "noble", category: "Noble Gas", color: "#8b5cf6", atomicNumber: 118 },
+            
+            // Halogens (4)
+            { symbol: "F", name: "Fluorine", valency: 1, type: "nonmetal", category: "Halogen", color: "#3b82f6", atomicNumber: 9 },
+            { symbol: "Cl", name: "Chlorine", valency: 1, type: "nonmetal", category: "Halogen", color: "#3b82f6", atomicNumber: 17 },
+            { symbol: "Br", name: "Bromine", valency: 1, type: "nonmetal", category: "Halogen", color: "#3b82f6", atomicNumber: 35 },
+            
+            // ========== METALLOIDS (8 elements) ==========
+            { symbol: "B", name: "Boron", valency: 3, type: "metalloid", category: "Metalloid", color: "#10b981", atomicNumber: 5 },
+            { symbol: "Si", name: "Silicon", valency: 4, type: "metalloid", category: "Metalloid", color: "#10b981", atomicNumber: 14 },
+            { symbol: "Ge", name: "Germanium", valency: 4, type: "metalloid", category: "Metalloid", color: "#10b981", atomicNumber: 32 },
+            { symbol: "As", name: "Arsenic", valency: 3, type: "metalloid", category: "Metalloid", color: "#10b981", atomicNumber: 33 },
+            { symbol: "Sb", name: "Antimony", valency: 3, type: "metalloid", category: "Metalloid", color: "#10b981", atomicNumber: 51 },
+            { symbol: "Te", name: "Tellurium", valency: 2, type: "metalloid", category: "Metalloid", color: "#10b981", atomicNumber: 52 },
+            { symbol: "Po", name: "Polonium", valency: 2, type: "metalloid", category: "Metalloid", color: "#10b981", atomicNumber: 84 },
+            
+            // ========== NOBLE GASES (7 elements) ==========
+            { symbol: "He", name: "Helium", valency: 0, type: "noble", category: "Noble Gas", color: "#8b5cf6", atomicNumber: 2 },
+            { symbol: "Ne", name: "Neon", valency: 0, type: "noble", category: "Noble Gas", color: "#8b5cf6", atomicNumber: 10 },
+            { symbol: "Ar", name: "Argon", valency: 0, type: "noble", category: "Noble Gas", color: "#8b5cf6", atomicNumber: 18 },
+            { symbol: "Kr", name: "Krypton", valency: 0, type: "noble", category: "Noble Gas", color: "#8b5cf6", atomicNumber: 36 },
+            { symbol: "Xe", name: "Xenon", valency: 0, type: "noble", category: "Noble Gas", color: "#8b5cf6", atomicNumber: 54 },
+            { symbol: "Rn", name: "Radon", valency: 0, type: "noble", category: "Noble Gas", color: "#8b5cf6", atomicNumber: 86 }
+        ];
+
+        // Famous compounds database
+        const famousCompounds = {
+            "NaCl": { name: "Sodium Chloride", type: "salt" },
+            "KCl": { name: "Potassium Chloride", type: "salt" },
+            "CaCl2": { name: "Calcium Chloride", type: "salt" },
+            "MgCl2": { name: "Magnesium Chloride", type: "salt" },
+            "AlCl3": { name: "Aluminum Chloride", type: "salt" },
+            "FeCl2": { name: "Iron(II) Chloride", type: "salt" },
+            "FeCl3": { name: "Iron(III) Chloride", type: "salt" },
+            "CuCl2": { name: "Copper(II) Chloride", type: "salt" },
+            "AgCl": { name: "Silver Chloride", type: "salt" },
+            "NaF": { name: "Sodium Fluoride", type: "salt" },
+            "NaBr": { name: "Sodium Bromide", type: "salt" },
+            "NaI": { name: "Sodium Iodide", type: "salt" },
+            "LiF": { name: "Lithium Fluoride", type: "salt" },
+            "LiCl": { name: "Lithium Chloride", type: "salt" },
+            "LiBr": { name: "Lithium Bromide", type: "salt" },
+            "LiI": { name: "Lithium Iodide", type: "salt" },
+            
+            "H2O": { name: "Water", type: "oxide" },
+            "CO2": { name: "Carbon Dioxide", type: "oxide" },
+            "CO": { name: "Carbon Monoxide", type: "oxide" },
+            "SO2": { name: "Sulfur Dioxide", type: "oxide" },
+            "SO3": { name: "Sulfur Trioxide", type: "oxide" },
+            "NO": { name: "Nitric Oxide", type: "oxide" },
+            "NO2": { name: "Nitrogen Dioxide", type: "oxide" },
+            "N2O": { name: "Nitrous Oxide", type: "oxide" },
+            
+            "Na2O": { name: "Sodium Oxide", type: "oxide" },
+            "MgO": { name: "Magnesium Oxide", type: "oxide" },
+            "CaO": { name: "Calcium Oxide", type: "oxide" },
+            "Al2O3": { name: "Aluminum Oxide", type: "oxide" },
+            "Fe2O3": { name: "Iron(III) Oxide", type: "oxide" },
+            "FeO": { name: "Iron(II) Oxide", type: "oxide" },
+            "CuO": { name: "Copper(II) Oxide", type: "oxide" },
+            "ZnO": { name: "Zinc Oxide", type: "oxide" },
+            "PbO": { name: "Lead(II) Oxide", type: "oxide" },
+            "TiO2": { name: "Titanium Dioxide", type: "oxide" },
+            
+            "HCl": { name: "Hydrochloric Acid", type: "acid" },
+            "HF": { name: "Hydrofluoric Acid", type: "acid" },
+            "HBr": { name: "Hydrobromic Acid", type: "acid" },
+            "HI": { name: "Hydroiodic Acid", type: "acid" },
+            "H2SO4": { name: "Sulfuric Acid", type: "acid" },
+            "HNO3": { name: "Nitric Acid", type: "acid" },
+            "H3PO4": { name: "Phosphoric Acid", type: "acid" },
+            "H2CO3": { name: "Carbonic Acid", type: "acid" },
+            
+            "NaOH": { name: "Sodium Hydroxide", type: "base" },
+            "KOH": { name: "Potassium Hydroxide", type: "base" },
+            "Ca(OH)2": { name: "Calcium Hydroxide", type: "base" },
+            "Mg(OH)2": { name: "Magnesium Hydroxide", type: "base" },
+            "Al(OH)3": { name: "Aluminum Hydroxide", type: "base" },
+            
+            "CH4": { name: "Methane", type: "covalent" },
+            "NH3": { name: "Ammonia", type: "covalent" },
+            "C2H6": { name: "Ethane", type: "covalent" },
+            "C2H4": { name: "Ethene", type: "covalent" },
+            "C2H2": { name: "Ethyne", type: "covalent" },
+            "SiC": { name: "Silicon Carbide", type: "covalent" },
+            "SiO2": { name: "Silicon Dioxide", type: "covalent" }
+        };
+
+        // Quick examples
+        const quickExamples = [
+            { metal: "Na", nonMetal: "Cl", name: "Sodium Chloride" },
+            { metal: "Mg", nonMetal: "O", name: "Magnesium Oxide" },
+            { metal: "Al", nonMetal: "Cl", name: "Aluminum Chloride" },
+            { metal: "K", nonMetal: "Br", name: "Potassium Bromide" },
+            { metal: "Ca", nonMetal: "F", name: "Calcium Fluoride" },
+            { metal: "Fe", nonMetal: "Cl", name: "Iron Chloride" },
+            { metal: "Cu", nonMetal: "O", name: "Copper Oxide" },
+            { metal: "Ag", nonMetal: "Cl", name: "Silver Chloride" },
+            { metal: "Zn", nonMetal: "S", name: "Zinc Sulfide" },
+            { metal: "Pb", nonMetal: "O", name: "Lead Oxide" }
+        ];
+
+        // DOM Elements
+        const metalDropdown = document.getElementById('metalDropdown');
+        const nonMetalDropdown = document.getElementById('nonMetalDropdown');
+        const metalOptions = document.getElementById('metalOptions');
+        const nonMetalOptions = document.getElementById('nonMetalOptions');
+        const metalSelected = document.getElementById('metalSelected');
+        const nonMetalSelected = document.getElementById('nonMetalSelected');
+        const generateBtn = document.getElementById('generateBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const themeToggle = document.getElementById('themeToggle');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const animationContainer = document.getElementById('animationContainer');
+        const leftParticle = document.getElementById('leftParticle');
+        const rightParticle = document.getElementById('rightParticle');
+        const statusText = document.getElementById('statusText');
+        const compoundResult = document.getElementById('compoundResult');
+        const formulaDisplay = document.getElementById('formulaDisplay');
+        const compoundName = document.getElementById('compoundName');
+        const compoundType = document.getElementById('compoundType');
+        const explanationContent = document.getElementById('explanationContent');
+        const valencyDisplay = document.getElementById('valencyDisplay');
+        const crossMethod = document.getElementById('crossMethod');
+        const chemistryDetails = document.getElementById('chemistryDetails');
+        const examplesGrid = document.getElementById('examplesGrid');
+
+        // App state
+        let selectedMetal = null;
+        let selectedNonMetal = null;
+        let isAnimating = false;
+        let isDarkMode = true;
+
+        // Initialize the app
+        function initApp() {
+            populateDropdowns();
+            setupExamples();
+            setupEventListeners();
+            setDefaultSelection();
+            updateUI();
+        }
+
+        // Populate dropdowns with categorized elements
+        function populateDropdowns() {
+            // Clear existing options
+            metalOptions.innerHTML = '';
+            nonMetalOptions.innerHTML = '';
+            
+            // Sort elements by atomic number
+            elements.sort((a, b) => a.atomicNumber - b.atomicNumber);
+            
+            // Populate metal dropdown (all metals: type === "metal")
+            elements.filter(el => el.type === "metal").forEach(element => {
+                const option = createOptionElement(element);
+                option.addEventListener('click', () => selectElement(element, 'metal'));
+                metalOptions.appendChild(option);
+            });
+            
+            // Populate non-metal dropdown (non-metals, metalloids, noble gases)
+            elements.filter(el => el.type !== "metal").forEach(element => {
+                const option = createOptionElement(element);
+                option.addEventListener('click', () => selectElement(element, 'nonmetal'));
+                nonMetalOptions.appendChild(option);
+            });
+        }
+
+        // Setup quick examples
+        function setupExamples() {
+            quickExamples.forEach(example => {
+                const metal = elements.find(el => el.symbol === example.metal);
+                const nonMetal = elements.find(el => el.symbol === example.nonMetal);
+                
+                if (metal && nonMetal) {
+                    const btn = document.createElement('div');
+                    btn.className = 'example-btn';
+                    btn.innerHTML = `${example.metal} + ${example.nonMetal}`;
+                    btn.addEventListener('click', () => {
+                        selectElement(metal, 'metal');
+                        selectElement(nonMetal, 'nonmetal');
+                        startAnimation();
+                    });
+                    examplesGrid.appendChild(btn);
+                }
+            });
+        }
+
+        // Create option element
+        function createOptionElement(element) {
+            const div = document.createElement('div');
+            div.className = 'element-option';
+            
+            let typeClass = 'type-metal';
+            if (element.type === 'nonmetal') typeClass = 'type-nonmetal';
+            else if (element.type === 'metalloid') typeClass = 'type-metalloid';
+            else if (element.type === 'noble') typeClass = 'type-noble';
+            else if (element.category === 'Transition Metal') typeClass = 'type-transition';
+            else if (element.category === 'Lanthanide') typeClass = 'type-lanthanide';
+            else if (element.category === 'Actinide') typeClass = 'type-actinide';
+            
+            div.innerHTML = `
+                <div>
+                    <span class="element-symbol">${element.symbol}</span>
+                    <span class="element-name">${element.name}</span>
+                    <span class="element-type ${typeClass}">${element.type === 'noble' ? 'noble' : element.category}</span>
+                </div>
+                <div class="element-valency">${element.valency}</div>
+            `;
+            return div;
+        }
+
+        // Set default selection (Na + Cl)
+        function setDefaultSelection() {
+            selectedMetal = elements.find(el => el.symbol === "Na");
+            selectedNonMetal = elements.find(el => el.symbol === "Cl");
+            updateSelectionDisplay();
+        }
+
+        // Handle element selection
+        function selectElement(element, type) {
+            if (type === 'metal') {
+                selectedMetal = element;
+                metalSelected.textContent = `${element.symbol} (${element.name})`;
+                metalOptions.classList.remove('show');
+            } else {
+                selectedNonMetal = element;
+                nonMetalSelected.textContent = `${element.symbol} (${element.name})`;
+                nonMetalOptions.classList.remove('show');
+            }
+            
+            updateUI();
+        }
+
+        // Update UI based on selection
+        function updateUI() {
+            // Update particle colors and symbols
+            if (selectedMetal) {
+                leftParticle.textContent = selectedMetal.symbol;
+                leftParticle.style.background = selectedMetal.color;
+            }
+            
+            if (selectedNonMetal) {
+                rightParticle.textContent = selectedNonMetal.symbol;
+                rightParticle.style.background = selectedNonMetal.color;
+            }
+            
+            // Enable/disable generate button
+            generateBtn.disabled = !(selectedMetal && selectedNonMetal);
+            
+            // Clear any previous errors
+            errorMessage.classList.remove('show');
+        }
+
+        // Validate combination
+        function validateCombination(metal, nonMetal) {
+            // Check for noble gases
+            if (metal.valency === 0 || nonMetal.valency === 0) {
+                return {
+                    valid: false,
+                    reason: "Noble gases have valency 0 and do not form compounds at school level"
+                };
+            }
+            
+            // All metal + non-metal combinations are valid for ionic compounds
+            if (metal.type === "metal" && nonMetal.type !== "metal") {
+                return { valid: true, reason: "Metal + Non-metal forms ionic compound" };
+            }
+            
+            // Metal + Metal (shouldn't happen with our dropdowns, but just in case)
+            if (metal.type === "metal" && nonMetal.type === "metal") {
+                return {
+                    valid: false,
+                    reason: "Two metals do not combine to form compounds at school level"
+                };
+            }
+            
+            return { valid: true, reason: "Elements can form covalent compound" };
+        }
+
+        // Greatest Common Divisor
+        function gcd(a, b) {
+            if (b === 0) return a;
+            return gcd(b, a % b);
+        }
+
+        // Convert to subscript
+        function toSubscript(num) {
+            const subscripts = ["₀", "₁", "₂", "₃", "₄", "₅", "₆", "₇", "₈", "₉"];
+            return num.toString().split('').map(digit => subscripts[parseInt(digit)]).join('');
+        }
+
+        // Generate chemical formula using cross method
+        function generateFormula(metal, nonMetal) {
+            // Apply cross method: swap valencies
+            let count1 = nonMetal.valency;
+            let count2 = metal.valency;
+            
+            // Handle zero valencies (should be caught by validation)
+            if (count1 === 0) count1 = 1;
+            if (count2 === 0) count2 = 1;
+            
+            // Simplify ratio
+            const divisor = gcd(count1, count2);
+            count1 = count1 / divisor;
+            count2 = count2 / divisor;
+            
+            // Build formula
+            let formula = metal.symbol;
+            if (count1 > 1) formula += toSubscript(count1);
+            formula += nonMetal.symbol;
+            if (count2 > 1) formula += toSubscript(count2);
+            
+            return { formula, count1, count2 };
+        }
+
+        // Get compound type
+        function getCompoundType(metal, nonMetal) {
+            // Acids: H + non-metal
+            if (metal.symbol === "H" && nonMetal.type !== "metal") {
+                return { type: "acid", class: "type-acid" };
+            }
+            
+            // Oxides: Oxygen compounds
+            if (nonMetal.symbol === "O") {
+                return { type: "oxide", class: "type-oxide" };
+            }
+            
+            // Bases: Metal + OH (special case, not handled here)
+            
+            // Ionic: Metal + Non-metal
+            if (metal.type === "metal" && nonMetal.type !== "metal") {
+                return { type: "ionic", class: "type-ionic" };
+            }
+            
+            // Covalent: Non-metal + Non-metal
+            if (metal.type !== "metal" && nonMetal.type !== "metal") {
+                return { type: "covalent", class: "type-covalent" };
+            }
+            
+            return { type: "salt", class: "type-salt" }; // Default
+        }
+
+        // Get compound name
+        function getCompoundName(formula, metal, nonMetal, count1, count2) {
+            // Remove subscripts for lookup
+            const formulaKey = formula.replace(/[₀₁₂₃₄₅₆₇₈₉]/g, match => {
+                const subscripts = "₀₁₂₃₄₅₆₇₈₉";
+                const numbers = "0123456789";
+                return numbers[subscripts.indexOf(match)] || match;
+            });
+            
+            // Check famous compounds
+            if (famousCompounds[formulaKey]) {
+                return famousCompounds[formulaKey].name;
+            }
+            
+            // Generate systematic name
+            let nonMetalName = nonMetal.name.toLowerCase();
+            
+            // Apply naming rules
+            if (nonMetalName.endsWith("gen") || nonMetalName.endsWith("ine")) {
+                nonMetalName = nonMetalName.replace(/gen$|ine$/, "ide");
+            } else if (nonMetalName.endsWith("um") || nonMetalName.endsWith("on")) {
+                nonMetalName = nonMetalName.replace(/um$|on$/, "ide");
+            } else {
+                nonMetalName += "ide";
+            }
+            
+            // Capitalize
+            nonMetalName = nonMetalName.charAt(0).toUpperCase() + nonMetalName.slice(1);
+            
+            return `${metal.name} ${nonMetalName}`;
+        }
+
+        // Start animation
+        async function startAnimation() {
+            if (isAnimating) return;
+            
+            // Validate first
+            const validation = validateCombination(selectedMetal, selectedNonMetal);
+            if (!validation.valid) {
+                showError(validation.reason);
+                return;
+            }
+            
+            isAnimating = true;
+            generateBtn.disabled = true;
+            compoundResult.style.display = 'none';
+            
+            // Lock dropdowns
+            metalDropdown.disabled = true;
+            nonMetalDropdown.disabled = true;
+            
+            // Animation steps
+            const steps = [
+                { text: "Analyzing elements...", delay: 500 },
+                { text: "Checking valency compatibility...", delay: 500 },
+                { text: "Applying cross method...", delay: 500 },
+                { text: "Stabilizing compound...", delay: 500 }
+            ];
+            
+            // Show status updates
+            for (const step of steps) {
+                statusText.textContent = step.text;
+                await sleep(step.delay);
+            }
+            
+            // Start particle animation
+            leftParticle.style.animation = 'moveRight 3s forwards';
+            rightParticle.style.animation = 'moveLeft 3s forwards';
+            
+            // Wait for animation to complete
+            await sleep(3000);
+            
+            // Show result
+            showResult();
+            isAnimating = false;
+            
+            // Re-enable controls
+            generateBtn.disabled = false;
+            metalDropdown.disabled = false;
+            nonMetalDropdown.disabled = false;
+        }
+
+        // Show result
+        function showResult() {
+            const { formula, count1, count2 } = generateFormula(selectedMetal, selectedNonMetal);
+            const compoundTypeInfo = getCompoundType(selectedMetal, selectedNonMetal);
+            const name = getCompoundName(formula, selectedMetal, selectedNonMetal, count1, count2);
+            
+            // Update result display
+            formulaDisplay.textContent = formula;
+            compoundName.textContent = name;
+            compoundType.textContent = compoundTypeInfo.type;
+            compoundType.className = `compound-type ${compoundTypeInfo.class}`;
+            
+            // Update chemistry details
+            updateChemistryDetails(selectedMetal, selectedNonMetal, formula, count1, count2);
+            
+            // Show result
+            compoundResult.style.display = 'block';
+            statusText.textContent = "Compound successfully formed!";
+        }
+
+        // Update chemistry details
+        function updateChemistryDetails(metal, nonMetal, formula, count1, count2) {
+            // Update valency display
+            const metalSign = metal.valency > 0 ? "+" : "";
+            const nonMetalSign = nonMetal.valency > 0 ? "+" : "-";
+            valencyDisplay.innerHTML = `
+                <span>${metal.symbol}<sup>${metalSign}${Math.abs(metal.valency)}</sup></span>
+                <i class="fas fa-plus" style="color: #94a3b8;"></i>
+                <span>${nonMetal.symbol}<sup>${nonMetalSign}${Math.abs(nonMetal.valency)}</sup></span>
+            `;
+            
+            // Update cross method
+            crossMethod.innerHTML = `
+                <strong>Cross Method:</strong><br>
+                ${metal.symbol}<sup>${metal.valency}</sup> + ${nonMetal.symbol}<sup>${nonMetal.valency}</sup> → 
+                ${metal.symbol}${count1 > 1 ? count1 : ''}${nonMetal.symbol}${count2 > 1 ? count2 : ''}
+            `;
+            
+            // Update explanation
+            const compoundTypeInfo = getCompoundType(metal, nonMetal);
+            explanationContent.innerHTML = `
+                <div class="explanation-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Element Valencies</div>
+                        <div class="step-description">
+                            ${metal.name} (${metal.symbol}) has valency ${metal.valency}<br>
+                            ${nonMetal.name} (${nonMetal.symbol}) has valency ${nonMetal.valency}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="explanation-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Cross Method Application</div>
+                        <div class="step-description">
+                            Swap valencies: ${metal.valency} → ${nonMetal.symbol}, ${nonMetal.valency} → ${metal.symbol}<br>
+                            Ratio: ${metal.symbol}:${count1}, ${nonMetal.symbol}:${count2}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="explanation-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Compound Formation</div>
+                        <div class="step-description">
+                            ${compoundTypeInfo.type.charAt(0).toUpperCase() + compoundTypeInfo.type.slice(1)} compound formed.<br>
+                            ${compoundTypeInfo.type === 'ionic' ? 'Electron transfer from metal to non-metal.' : 
+                              compoundTypeInfo.type === 'covalent' ? 'Electron sharing between non-metals.' :
+                              'Chemical combination complete.'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Show error
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.classList.add('show');
+        }
+
+        // Reset simulation
+        function resetSimulation() {
+            selectedMetal = elements.find(el => el.symbol === "Na");
+            selectedNonMetal = elements.find(el => el.symbol === "Cl");
+            
+            updateSelectionDisplay();
+            updateUI();
+            
+            // Reset animation
+            leftParticle.style.animation = 'none';
+            rightParticle.style.animation = 'none';
+            void leftParticle.offsetWidth; // Trigger reflow
+            void rightParticle.offsetWidth;
+            
+            compoundResult.style.display = 'none';
+            statusText.textContent = "Ready to generate compound";
+            errorMessage.classList.remove('show');
+        }
+
+        // Update selection display
+        function updateSelectionDisplay() {
+            if (selectedMetal) {
+                metalSelected.textContent = `${selectedMetal.symbol} (${selectedMetal.name})`;
+            }
+            if (selectedNonMetal) {
+                nonMetalSelected.textContent = `${selectedNonMetal.symbol} (${selectedNonMetal.name})`;
+            }
+        }
+
+        // Sleep utility
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Dropdown toggles
+            metalDropdown.addEventListener('click', () => {
+                metalOptions.classList.toggle('show');
+                nonMetalOptions.classList.remove('show');
+            });
+            
+            nonMetalDropdown.addEventListener('click', () => {
+                nonMetalOptions.classList.toggle('show');
+                metalOptions.classList.remove('show');
+            });
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.element-dropdown')) {
+                    metalOptions.classList.remove('show');
+                    nonMetalOptions.classList.remove('show');
+                }
+            });
+            
+            // Generate button
+            generateBtn.addEventListener('click', startAnimation);
+            
+            // Reset button
+            resetBtn.addEventListener('click', resetSimulation);
+            
+            // Theme toggle
+            themeToggle.addEventListener('click', () => {
+                isDarkMode = !isDarkMode;
+                document.body.classList.toggle('light-mode', !isDarkMode);
+                
+                const icon = themeToggle.querySelector('i');
+                icon.className = isDarkMode ? 'fas fa-moon' : 'fas fa-sun';
+                
+                localStorage.setItem('chemLabProTheme', isDarkMode ? 'dark' : 'light');
+            });
+            
+            // Enter key support
+            document.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !isAnimating && selectedMetal && selectedNonMetal) {
+                    startAnimation();
+                }
+            });
+        }
+
+        // Initialize the app
+        window.addEventListener('DOMContentLoaded', () => {
+            initApp();
+            
+            // Load saved theme
+            const savedTheme = localStorage.getItem('chemLabProTheme');
+            if (savedTheme === 'light') {
+                isDarkMode = false;
+                document.body.classList.add('light-mode');
+                themeToggle.querySelector('i').className = 'fas fa-sun';
+            }
+        });
+    </script>
+</body>
+</html>
